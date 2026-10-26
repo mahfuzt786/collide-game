@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Collide</title>
+  <meta name="description" content="A real-time multiplayer territory game. Pick a cell. If someone else picks it too, it cracks." />
+  <meta name="theme-color" content="#0d1021" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='13' height='13' rx='3' fill='%23ff5d73'/%3E%3Crect x='17' y='17' width='13' height='13' rx='3' fill='%233ec5ff'/%3E%3Crect x='17' y='2' width='13' height='13' rx='3' fill='%23262b4d'/%3E%3Crect x='2' y='17' width='13' height='13' rx='3' fill='%23ffd23f'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main id="app">
+    <!-- HOME -->
+    <section id="screen-home" class="screen" hidden>
+      <header class="brand">
+        <div class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <h1>Collide</h1>
+        <p class="tagline">Grab land. Guess what everyone else is grabbing.</p>
+      </header>
+
+      <div class="card">
+        <label class="field">
+          <span>Your name</span>
+          <input id="name" maxlength="16" autocomplete="nickname" placeholder="e.g. Sam" />
+        </label>
+        <button id="btn-create" class="btn primary">Create a room</button>
+        <div class="divider"><span>or join a friend</span></div>
+        <div class="join-row">
+          <input id="code" maxlength="4" placeholder="CODE" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-label="Room code" />
+          <button id="btn-join" class="btn">Join</button>
+        </div>
+      </div>
+
+      <details class="card rules" open>
+        <summary>How to play</summary>
+        <div class="rules-body"></div>
+      </details>
+    </section>
+
+    <!-- LOBBY -->
+    <section id="screen-lobby" class="screen" hidden>
+      <div class="card center">
+        <p class="eyebrow">Room code</p>
+        <div id="lobby-code" class="room-code"></div>
+        <p class="muted small">Friends open this site and enter the code, or use the link.</p>
+        <button id="btn-share" class="btn">Copy invite link</button>
+      </div>
+
+      <div class="card">
+        <h2>Players <span id="lobby-count" class="muted"></span></h2>
+        <ul id="lobby-players" class="player-list"></ul>
+        <button id="btn-start" class="btn primary" hidden>Start game</button>
+        <p id="lobby-wait" class="muted center small" hidden></p>
+      </div>
+
+      <details class="card rules">
+        <summary>How to play</summary>
+        <div class="rules-body"></div>
+      </details>
+      <button class="btn ghost btn-leave">Leave room</button>
+    </section>
+
+    <!-- GAME -->
+    <section id="screen-game" class="screen game" hidden>
+      <div class="topbar">
+        <div><span class="eyebrow">Round</span> <strong id="round"></strong></div>
+        <div class="timer-wrap" aria-hidden="true"><div id="timer-bar"></div></div>
+        <div id="timer-text" class="timer-text"></div>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+      <div class="board-wrap">
+        <div id="board" class="board" role="grid" aria-label="Game board"></div>
+      </div>
+      <ul id="scoreboard" class="scoreboard"></ul>
+      <div class="game-actions">
+        <details class="rules compact">
+          <summary>Rules</summary>
+          <div class="rules-body"></div>
+        </details>
+        <button class="btn ghost small btn-leave">Leave</button>
+      </div>
+
+      <div id="over" class="overlay" hidden>
+        <div class="card center over-card">
+          <p class="eyebrow">Game over</p>
+          <h2 id="over-title"></h2>
+          <ol id="standings" class="standings"></ol>
+          <p class="muted small">Ties are broken by your biggest connected area.</p>
+          <button id="btn-again" class="btn primary" hidden>Play again</button>
+          <p id="over-wait" class="muted small" hidden>Waiting for the host to start a new game…</p>
+          <button id="btn-view-board" class="btn ghost small">View final board</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" role="alert" hidden></div>
+    <p id="conn" class="conn" hidden>Reconnecting…</p>
+  </main>
+
+  <template id="rules-template">
+    <ol>
+      <li><b>Every round, everyone secretly taps one empty cell at the same time.</b> You have 15 seconds.</li>
+      <li>If you were the <b>only one</b> to pick that cell, it becomes yours.</li>
+      <li>If <b>two or more</b> players pick the same cell, it <b>cracks</b> and nobody can ever take it.</li>
+      <li>Your first pick can be anywhere. After that you must pick a cell <b>touching your land</b> (up, down, left or right). Cells you can pick glow. If you're boxed in, you can pick anywhere.</li>
+      <li>When the board is full, the player with the <b>most cells wins</b>.</li>
+    </ol>
+    <p class="muted small">Tip: you can change your pick until the timer runs out or everyone has locked in.</p>
+  </template>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>
